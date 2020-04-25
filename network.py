@@ -46,8 +46,9 @@ class GUNet(nn.Module):
             self.out_params = nn.Linear(self.dense_dim, output_dim)
         # ks = [4000, 3000, 2000, 1000]
         ks = [0.9, 0.7, 0.6, 0.5]
-        self.gUnet = ops.GraphUnet(ks, num_node_feats, 97).cuda()
-
+#        self.gUnet = ops.GraphUnet(ks, num_node_feats, 97).cuda()
+        self.gUnet = ops.GraphUnet(ks, num_node_feats, 97)
+        
         weights_init(self)
 
     def forward(self, graph_list, node_feat, edge_feat):

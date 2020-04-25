@@ -4,6 +4,9 @@ import networkx as nx
 import argparse
 from sklearn.model_selection import StratifiedKFold
 
+# added by Guan
+import matplotlib.pyplot as plt
+
 
 cmd_opt = argparse.ArgumentParser(description='Argparser for graph_classification')
 cmd_opt.add_argument('-mode', default='cpu', help='cpu/gpu')
@@ -64,7 +67,8 @@ def load_data():
     label_dict = {}
     feat_dict = {}
 
-    with open('data/%s/%s.txt' % (cmd_args.data, cmd_args.data), 'r') as f:
+#    with open('data/%s/%s.txt' % (cmd_args.data, cmd_args.data), 'r') as f:
+    with open('data/%s/%s.txt' % ('DD', 'DD'), 'r') as f:
         n_g = int(f.readline().strip())
         for i in range(n_g):
             row = f.readline().strip().split()
@@ -105,6 +109,14 @@ def load_data():
                 node_features = None
                 node_feature_flag = False
 
+#            Here we draw the graph g
+#            if i < 10:
+#                position = nx.spring_layout(g) 
+#                plt.figure()
+#                nx.draw(g, pos = position, node_size = 50)
+#                plt.show()
+                
+                
             #assert len(g.edges()) * 2 == n_edges  (some graphs in COLLAB have self-loops, ignored here)
             assert len(g) == n
             g_list.append(S2VGraph(g, l, node_tags, node_features))
