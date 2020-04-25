@@ -24,7 +24,6 @@ class Classifier(nn.Module):
         model = GUNet
 
         self.s2v = model(
-            latent_dim=cmd_args.latent_dim,
             output_dim=cmd_args.out_dim,
             num_node_feats=cmd_args.feat_dim+cmd_args.attr_dim,
             num_edge_feats=0,
