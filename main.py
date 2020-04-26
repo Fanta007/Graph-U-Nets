@@ -156,7 +156,11 @@ if __name__ == '__main__':
     np.random.seed(cmd_args.seed)
     torch.manual_seed(cmd_args.seed)
 
-    train_graphs, test_graphs = load_data()
+    train_graphs_all, test_graphs_all = load_data()
+    
+    train_graphs = train_graphs_all[0:6]
+    test_graphs = test_graphs_all[0:2]
+    
     print('# train: %d, # test: %d' % (len(train_graphs), len(test_graphs)))
 
     if cmd_args.sortpooling_k <= 1:
