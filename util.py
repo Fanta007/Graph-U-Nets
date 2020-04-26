@@ -12,7 +12,7 @@ cmd_opt = argparse.ArgumentParser(description='Argparser for graph_classificatio
 cmd_opt.add_argument('-mode', default='cpu', help='cpu/gpu')
 cmd_opt.add_argument('-data', default=None, help='data folder name')
 #cmd_opt.add_argument('-batch_size', type=int, default=50, help='minibatch size')
-cmd_opt.add_argument('-batch_size', type=int, default=1, help='minibatch size')
+cmd_opt.add_argument('-batch_size', type=int, default= 6, help='minibatch size')
 cmd_opt.add_argument('-seed', type=int, default=1, help='seed')
 cmd_opt.add_argument('-feat_dim', type=int, default=0, help='dimension of discrete node feature (maximum node tag)')
 cmd_opt.add_argument('-num_class', type=int, default=0, help='#classes')
