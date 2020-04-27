@@ -109,12 +109,12 @@ def loop_dataset(g_list, classifier, sample_idxes, optimizer=None,
                  bsize=cmd_args.batch_size):
     total_loss = []
     total_iters = (len(sample_idxes) + (bsize - 1) * (optimizer is None)) // bsize # noqa
-    pbar = tqdm(range(total_iters), unit='batch')
+#    pbar = tqdm(range(total_iters), unit='batch')
     all_targets = []
     all_scores = []
 
     n_samples = 0
-    for pos in pbar:
+    for pos in range(total_iters):
         selected_idx = sample_idxes[pos * bsize: (pos + 1) * bsize]
 
         batch_graph = [g_list[idx] for idx in selected_idx]
@@ -129,7 +129,7 @@ def loop_dataset(g_list, classifier, sample_idxes, optimizer=None,
             optimizer.step()
 
         loss = loss.data.cpu().numpy()
-        pbar.set_description('loss: %0.5f acc: %0.5f' % (loss, acc))
+#        pbar.set_description('loss: %0.5f acc: %0.5f' % (loss, acc))
 
         total_loss.append(np.array([loss, acc]) * len(selected_idx))
 
@@ -143,9 +143,9 @@ def loop_dataset(g_list, classifier, sample_idxes, optimizer=None,
     # np.savetxt('test_scores.txt', all_scores)  # output test predictions
 
     all_targets = np.array(all_targets)
-    fpr, tpr, _ = metrics.roc_curve(all_targets, all_scores, pos_label=1)
-    auc = metrics.auc(fpr, tpr)
-    avg_loss = np.concatenate((avg_loss, [auc]))
+#    fpr, tpr, _ = metrics.roc_curve(all_targets, all_scores, pos_label=1)
+#    auc = metrics.auc(fpr, tpr)
+    avg_loss = np.concatenate((avg_loss, [1000]))
 
     return avg_loss
 
@@ -158,8 +158,8 @@ if __name__ == '__main__':
 
     train_graphs_all, test_graphs_all = load_data()
     
-    train_graphs = train_graphs_all[0:6]
-    test_graphs = test_graphs_all[0:2]
+    train_graphs = train_graphs_all[0:-1]
+    test_graphs = test_graphs_all[0:-1]
     
     print('# train: %d, # test: %d' % (len(train_graphs), len(test_graphs)))
 
@@ -185,19 +185,30 @@ if __name__ == '__main__':
     for epoch in range(cmd_args.num_epochs):
         random.shuffle(train_idxes)
         classifier.train()
+        
         avg_loss = loop_dataset(
             train_graphs, classifier, train_idxes, optimizer=optimizer)
+        
         if not cmd_args.printAUC:
             avg_loss[2] = 0.0
         print('\033[92maverage training of epoch %d: loss %.5f acc %.5f auc %.5f\033[0m' % (epoch, avg_loss[0], avg_loss[1], avg_loss[2])) # noqa
 
-        classifier.eval()
-        test_loss = loop_dataset(
-            test_graphs, classifier, list(range(len(test_graphs))))
-        if not cmd_args.printAUC:
-            test_loss[2] = 0.0
-        print('\033[93maverage test of epoch %d: loss %.5f acc %.5f auc %.5f\033[0m' % (epoch, test_loss[0], test_loss[1], test_loss[2])) # noqa
-        max_acc = max(max_acc, test_loss[1])
+#        classifier.eval()
+#        test_loss = loop_dataset(
+#            test_graphs, classifier, list(range(len(test_graphs))))
+#        if not cmd_args.printAUC:
+#            test_loss[2] = 0.0
+#        print('\033[93maverage test of epoch %d: loss %.5f acc %.5f auc %.5f\033[0m' % (epoch, test_loss[0], test_loss[1], test_loss[2])) # noqa
+#        max_acc = max(max_acc, test_loss[1])
+        
+# Now we test the model
+    classifier.eval()
+    test_loss = loop_dataset(
+        test_graphs, classifier, list(range(len(test_graphs))))
+    if not cmd_args.printAUC:
+        test_loss[2] = 0.0
+    print('\033[93maverage test: loss %.5f acc %.5f auc %.5f\033[0m' % ( test_loss[0], test_loss[1], test_loss[2])) # noqa
+    max_acc = max(max_acc, test_loss[1])
 
     with open('acc_result_%s.txt' % cmd_args.data, 'a+') as f:
         # f.write(str(test_loss[1]) + '\n')
